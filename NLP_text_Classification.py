@@ -9,12 +9,14 @@ Created on Wed May 26 01:49:00 2021
 import re
 import nltk
 import sklearn
+import numpy as np
 from numpy import array
 nltk.download('wordnet')
 nltk.download('stopwords')
 import pickle
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer 
+from sklearn.metrics import plot_roc_curve
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -79,7 +81,26 @@ classifier = LogisticRegression()
 classifier.fit(x_train, y_train) 
 yPredications = classifier.predict(x_test)
 print("Accuracy: " , accuracy_score(y_test, yPredications))
+countPos = 0 ;
+countNeg = 0 ; 
 
+for i in range(len(yPredications)):
+    if (yPredications[i]==0):
+        countNeg=countNeg+1 
+    else:
+        countPos=countPos+1
+    
+   
+print("countNeg= " , countNeg , "  countPos= " ,countPos)
+x_test = range(100)
+y_test = range(100) + np.random.randint(0,30,100)
+plt.rcParams.update({'figure.figsize':(10,8), 'figure.dpi':200})
+plt.scatter(x_test, y_test, c=y_test, cmap='Spectral')
+plt.colorbar()
+plt.title('Simple Scatter plot')
+plt.xlabel('X - value')
+plt.ylabel('Y - value')
+plt.show()
 """
 with open('text_classifier', 'wb') as picklefile:
     pickle.dump(classifier,picklefile)
