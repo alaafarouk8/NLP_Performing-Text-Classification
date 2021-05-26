@@ -22,6 +22,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.linear_model import LogisticRegression
+import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report, confusion_matrix , accuracy_score
 
 # Init the Wordnet Lemmatizer
@@ -77,4 +78,19 @@ x_train , x_test,y_train,y_test = Splitingthedata(x,y_)
 classifier = LogisticRegression()
 classifier.fit(x_train, y_train) 
 yPredications = classifier.predict(x_test)
-print(accuracy_score(y_test, yPredications))
+print("Accuracy: " , accuracy_score(y_test, yPredications))
+
+"""
+with open('text_classifier', 'wb') as picklefile:
+    pickle.dump(classifier,picklefile)
+
+with open('text_classifier', 'rb') as training_model:
+    model = pickle.load(training_model)
+ 
+
+w = input("enter word:")
+zz = Preparedata(w)
+y_pred2 = model.predict([zz])
+print(y_pred2)
+
+"""
