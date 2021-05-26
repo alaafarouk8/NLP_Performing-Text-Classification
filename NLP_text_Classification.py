@@ -121,21 +121,8 @@ with open('text_classifier', 'rb') as training_model:
         print('positive')
     else:
         print("negative")
-    print("countNeg= " , c1 , "  countPos= " ,c2)
+    #print("countNeg= " , c1 , "  countPos= " ,c2)
     print (y_pred2)
-#####################################################################################
-"""
-countPos = 0 ;
-countNeg = 0 ; 
-
-for i in range(len(yPredications)):
-    if (yPredications[i]==0):
-        countNeg=countNeg+1 
-    else:
-        countPos=countPos+1
- 
-print("countNeg= " , countNeg , "  countPos= " ,countPos)
-"""
 #####################################################################################
 x_test = range(100)
 y_test = range(100) + np.random.randint(0,30,100)
