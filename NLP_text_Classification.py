@@ -5,19 +5,21 @@ Created on Wed May 26 01:49:00 2021
 @author: ALAA
 """
 #import libraries
+# container path  = C:\Users\ALAA\OneDrive\Documents\GitHub\NLP_Performing-Text-Classification\dataset
 import numpy as np
 import re
 import nltk
 import sklearn
 nltk.download('wordnet')
+nltk.download('stopwords')
 import pickle
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer 
+from sklearn.feature_extraction.text import CountVectorizer
 # Init the Wordnet Lemmatizer
 lemmatizer = WordNetLemmatizer()
 stemmer = WordNetLemmatizer()
 files = []
-# container path  = C:\Users\ALAA\OneDrive\Documents\GitHub\NLP_Performing-Text-Classification\dataset
 
 # load files is done
 def LoadFiles():
@@ -44,13 +46,17 @@ def  Preparedata(X):
         print (file)
         files.append(file)
         return files
+# Count Vectorizer
+def getCountVectorizer_(f):
+    vectorizer = CountVectorizer(max_features=1500, min_df=5, stop_words=stopwords.words('english'))
+    X = vectorizer.fit_transform(f).toarray()
+  #  print(vectorizer.get_feature_names())
+    return X
        
         
-
-
-
-
-
-
-x , y = LoadFiles() 
-Preparedata(x)    
+       
+        
+x,y= LoadFiles() 
+files = Preparedata(x) 
+x=getCountVectorizer_(files)
+   
