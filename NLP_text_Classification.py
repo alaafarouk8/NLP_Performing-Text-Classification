@@ -31,8 +31,27 @@ from sklearn.metrics import classification_report, confusion_matrix , accuracy_s
 lemmatizer = WordNetLemmatizer()
 stemmer = WordNetLemmatizer()
 files = []
-
-
+#####################################################################################
+#count function 
+def cnt(y_pred2):
+    cntNeg = 0 
+    cntPos = 0
+    for i in range(len(y_pred2)):
+        if (y_pred2[i]==0):
+            cntNeg=cntNeg+1 
+        else:
+            cntPos=cntPos+1
+    return cntNeg , cntPos 
+#####################################################################################
+def tokenizeText(text):
+    text = text.lower()
+    text = re.sub('[^\sa-zA-Z0-9ء-ي]', '', text)
+    text = re.sub(r'\s+[a-zA-Z]\s+', ' ', text)
+    text = re.sub(r'\^[a-zA-Z]\s+', ' ', text) 
+    text = re.sub(r'\s+', ' ', text, flags=re.I)
+    text = re.sub(r'^b\s+', '', text)
+    return text.split()
+#####################################################################################
 # Count Vectorizer
 def getCountVectorizer_(f):
     vectorizer = CountVectorizer()
@@ -42,9 +61,17 @@ def getCountVectorizer_(f):
 
 # load files is done
 def LoadFiles():
+    positive , negative = 0 , 0
     dataset = sklearn.datasets.load_files(r"C:\Users\ALAA\OneDrive\Documents\GitHub\NLP_Performing-Text-Classification\dataset", description=None, categories=None, load_content=True, shuffle=True, random_state=0)
     X , Y = dataset.data , dataset.target     # y is an array of 0s , 1s.
-    return X , Y
+    for i in range(len(dataset.target)):
+        if (dataset.target[i]==0):
+            negative = negative+1
+         #   print (" dataset[ " , i ," ]" , " is negative")
+        else:
+            positive = positive+1
+       #     print (" dataset[ " , i ," ]"," is positive")
+    return X , Y ,negative,positive
 
 # preparing data for generating tf-idf for the samples 
 def  Preparedata(X):
@@ -71,16 +98,33 @@ def generate_tfidf(files):
 def Splitingthedata(x,y):
     Xtrain, Xtest, Ytrain, Ytest = train_test_split(x, y, test_size=0.2, random_state=0)
     return Xtrain, Xtest, Ytrain, Ytest
-    
-x_ , y_ = LoadFiles() 
+######################################################################################
+# calling the functions
+x_ , y_ ,pC , nC= LoadFiles() 
 files = Preparedata(x_)
 x = generate_tfidf(files)
 x_train , x_test,y_train,y_test = Splitingthedata(x,y_)
-
 classifier = LogisticRegression()
 classifier.fit(x_train, y_train) 
 yPredications = classifier.predict(x_test)
-print("Accuracy: " , accuracy_score(y_test, yPredications))
+print("Accuracy: " , accuracy_score(y_test, yPredications)*100)
+with open('text_classifier', 'wb') as picklefile:
+    pickle.dump(classifier,picklefile)
+with open('text_classifier', 'rb') as training_model:
+    model = pickle.load(training_model)
+    f = input("enter review: ")
+    z=Preparedata(f)
+    a= generate_tfidf(z)
+    y_pred2 = model.predict(a)
+    c1,c2 = cnt(y_pred2)
+    if (c1<c2):
+        print('positive')
+    else:
+        print("negative")
+    print("countNeg= " , c1 , "  countPos= " ,c2)
+    print (y_pred2)
+#####################################################################################
+"""
 countPos = 0 ;
 countNeg = 0 ; 
 
@@ -89,29 +133,20 @@ for i in range(len(yPredications)):
         countNeg=countNeg+1 
     else:
         countPos=countPos+1
-    
-   
+ 
 print("countNeg= " , countNeg , "  countPos= " ,countPos)
+"""
+#####################################################################################
 x_test = range(100)
 y_test = range(100) + np.random.randint(0,30,100)
 plt.rcParams.update({'figure.figsize':(10,8), 'figure.dpi':200})
 plt.scatter(x_test, y_test, c=y_test, cmap='Spectral')
 plt.colorbar()
-plt.title('Simple Scatter plot')
+plt.title('Text Classifications')
 plt.xlabel('X - value')
 plt.ylabel('Y - value')
 plt.show()
-"""
-with open('text_classifier', 'wb') as picklefile:
-    pickle.dump(classifier,picklefile)
+#####################################################################################
 
-with open('text_classifier', 'rb') as training_model:
-    model = pickle.load(training_model)
- 
 
-w = input("enter word:")
-zz = Preparedata(w)
-y_pred2 = model.predict([zz])
-print(y_pred2)
 
-"""
