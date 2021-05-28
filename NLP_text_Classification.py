@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
 """
 Created on Wed May 26 01:49:00 2021
-
 @author: ALAA
 """
 #import libraries
@@ -124,10 +122,8 @@ with open('text_classifier', 'rb') as training_model:
    # print("countNeg= " , c1 , "  countPos= " ,c2)
    #   print (y_pred2)
 #####################################################################################
-x_test = range(100)
-y_test = range(100) + np.random.randint(0,30,100)
-plt.rcParams.update({'figure.figsize':(10,8), 'figure.dpi':200})
-plt.scatter(x_test, y_test, c=y_test, cmap='Spectral')
+#plt.rcParams.update({'figure.figsize':(10,8), 'figure.dpi':200})
+plt.scatter(x_test, y_test)
 plt.colorbar()
 plt.title('Text Classifications')
 plt.xlabel('X - value')
