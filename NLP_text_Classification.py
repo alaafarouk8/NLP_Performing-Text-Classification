@@ -1,13 +1,17 @@
+# -*- coding: utf-8 -*-
 """
 Created on Wed May 26 01:49:00 2021
 @author: ALAA
 """
+
 #import libraries
 # container path  = C:\Users\ALAA\OneDrive\Documents\GitHub\NLP_Performing-Text-Classification\dataset
 import re
 import nltk
 import sklearn
 import numpy as np
+import numpy
+import matplotlib.pyplot as plt
 from numpy import array
 nltk.download('wordnet')
 nltk.download('stopwords')
@@ -23,7 +27,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
-from sklearn.metrics import classification_report, confusion_matrix , accuracy_score
+from sklearn.metrics import  accuracy_score
 
 # Init the Wordnet Lemmatizer
 lemmatizer = WordNetLemmatizer()
@@ -41,6 +45,11 @@ def cnt(y_pred2):
             cntPos=cntPos+1
     return cntNeg , cntPos 
 #####################################################################################
+def getTFIDF(X):
+    tfidfconverter = TfidfTransformer()
+    X = tfidfconverter.fit_transform(X).toarray()
+    return X
+#####################################################################################
 def tokenizeText(text):
     text = text.lower()
     text = re.sub('[^\sa-zA-Z0-9ء-ي]', '', text)
@@ -54,9 +63,8 @@ def tokenizeText(text):
 def getCountVectorizer_(f):
     vectorizer = CountVectorizer()
     X = vectorizer.fit_transform(f).toarray()
-  #  print(vectorizer.get_feature_names())
     return X
-
+######################################################################################
 # load files is done
 def LoadFiles():
     positive , negative = 0 , 0
@@ -70,7 +78,7 @@ def LoadFiles():
             positive = positive+1
        #     print (" dataset[ " , i ," ]"," is positive")
     return X , Y ,negative,positive
-
+######################################################################################
 # preparing data for generating tf-idf for the samples 
 def  Preparedata(X):
     for i in range(len(X)):
@@ -85,13 +93,13 @@ def  Preparedata(X):
          file = ' '.join(file)
          files.append(file)
     return files
-
+######################################################################################
 #  generate tf-idf for the samples 
 def generate_tfidf(files):
     tfidfconverter = TfidfVectorizer(max_features=1500,min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
     x = tfidfconverter.fit_transform(files).toarray()
     return x
-
+######################################################################################
 # divide the data into 20% test set and 80% training set.
 def Splitingthedata(x,y):
     Xtrain, Xtest, Ytrain, Ytest = train_test_split(x, y, test_size=0.2, random_state=0)
@@ -105,23 +113,31 @@ x_train , x_test,y_train,y_test = Splitingthedata(x,y_)
 classifier = LogisticRegression()
 classifier.fit(x_train, y_train) 
 yPredications = classifier.predict(x_test)
-print("Accuracy: " , accuracy_score(y_test, yPredications)*100)
-with open('text_classifier', 'wb') as picklefile:
+print("Accuracy: %" , accuracy_score(y_test, yPredications)*100)
+with open('assignment2', 'wb') as picklefile:
     pickle.dump(classifier,picklefile)
-with open('text_classifier', 'rb') as training_model:
+with open('assignment2', 'rb') as training_model:
     model = pickle.load(training_model)
     f = input("enter review: ")
     z=Preparedata(f)
     a= generate_tfidf(z)
-    y_pred2 = model.predict(a)
-    c1,c2 = cnt(y_pred2)
-    if (c1<c2):
-        print('positive')
+    y_pred2 = model.predict(a)[0]
+    if (y_pred2==0):
+        print("Negative review !! ")
     else:
-        print("negative")
-   # print("countNeg= " , c1 , "  countPos= " ,c2)
-   #   print (y_pred2)
+        print ("Positive review ")
+
 #####################################################################################
+"""
+mymodel = numpy.poly1d(numpy.polyfit(x_test,y_test, 3))
+
+myline = numpy.linspace(0, 6, 100)
+
+plt.scatter(x_test,y_test)
+plt.plot(myline, mymodel(myline))
+plt.show()
+#####################################################################################
+
 #plt.rcParams.update({'figure.figsize':(10,8), 'figure.dpi':200})
 plt.scatter(x_test, y_test)
 plt.colorbar()
@@ -129,7 +145,7 @@ plt.title('Text Classifications')
 plt.xlabel('X - value')
 plt.ylabel('Y - value')
 plt.show()
+"""
 #####################################################################################
-
 
 
