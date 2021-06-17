@@ -28,7 +28,8 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 from sklearn.metrics import  accuracy_score
-
+from sklearn import svm
+from sklearn.neural_network import MLPClassifier
 # Init the Wordnet Lemmatizer
 lemmatizer = WordNetLemmatizer()
 stemmer = WordNetLemmatizer()
@@ -45,11 +46,6 @@ def cnt(y_pred2):
             cntPos=cntPos+1
     return cntNeg , cntPos 
 #####################################################################################
-def getTFIDF(X):
-    tfidfconverter = TfidfTransformer()
-    X = tfidfconverter.fit_transform(X).toarray()
-    return X
-#####################################################################################
 def tokenizeText(text):
     text = text.lower()
     text = re.sub('[^\sa-zA-Z0-9ء-ي]', '', text)
@@ -59,16 +55,11 @@ def tokenizeText(text):
     text = re.sub(r'^b\s+', '', text)
     return text.split()
 #####################################################################################
-# Count Vectorizer
-def getCountVectorizer_(f):
-    vectorizer = CountVectorizer()
-    X = vectorizer.fit_transform(f).toarray()
-    return X
-######################################################################################
+
 # load files is done
 def LoadFiles():
     positive , negative = 0 , 0
-    dataset = sklearn.datasets.load_files(r"C:\Users\ALAA\OneDrive\Documents\GitHub\NLP_Performing-Text-Classification\dataset", description=None, categories=None, load_content=True, shuffle=True, random_state=0)
+    dataset = sklearn.datasets.load_files(r"C:\Users\ALAA\OneDrive\Documents\GitHub\NLP_Performing-Text-Classification\dataset", description=None, categories=None, load_content=True, shuffle=False, random_state=0)
     X , Y = dataset.data , dataset.target     # y is an array of 0s , 1s.
     for i in range(len(dataset.target)):
         if (dataset.target[i]==0):
@@ -86,19 +77,25 @@ def  Preparedata(X):
          file = re.sub(r'\s+[a-zA-Z]\s+', ' ', file)
          file = re.sub(r'\^[a-zA-Z]\s+', ' ', file) 
          file = re.sub(r'\s+', ' ', file, flags=re.I)
-         file = re.sub(r'^b\s+', '', file)
          file = file.lower()
          file = file.split()
          file = [stemmer.lemmatize(word) for word in file]
          file = ' '.join(file)
+       #  print(file)
          files.append(file)
     return files
 ######################################################################################
+# Count Vectorizer
+def getCountVectorizer_(f):
+    vectorizer = CountVectorizer(max_features=1000, min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
+    X = vectorizer.fit_transform(f).toarray()
+    return X
+######################################################################################
 #  generate tf-idf for the samples 
-def generate_tfidf(files):
-    tfidfconverter = TfidfVectorizer(max_features=1500,min_df=5, max_df=0.7, stop_words=stopwords.words('english'))
-    x = tfidfconverter.fit_transform(files).toarray()
-    return x
+def getTFIDF(files):
+    tfidfconverter = TfidfTransformer()
+    X= tfidfconverter.fit_transform(files).toarray()
+    return X
 ######################################################################################
 # divide the data into 20% test set and 80% training set.
 def Splitingthedata(x,y):
@@ -108,24 +105,32 @@ def Splitingthedata(x,y):
 # calling the functions
 x_ , y_ ,pC , nC= LoadFiles() 
 files = Preparedata(x_)
-x = generate_tfidf(files)
+e=getCountVectorizer_(files)
+x = getTFIDF(e)
 x_train , x_test,y_train,y_test = Splitingthedata(x,y_)
 classifier = LogisticRegression()
+#classifier =svm.SVC(C=1.0, kernel='rbf', degree=3, shrinking=True, probability=False,tol=0.001, cache_size=200, class_weight=None, verbose=False, max_iter=-1, random_state=None)
 classifier.fit(x_train, y_train) 
 yPredications = classifier.predict(x_test)
 print("Accuracy: %" , accuracy_score(y_test, yPredications)*100)
+
 with open('assignment2', 'wb') as picklefile:
     pickle.dump(classifier,picklefile)
 with open('assignment2', 'rb') as training_model:
-    model = pickle.load(training_model)
-    f = input("enter review: ")
-    z=Preparedata(f)
-    a= generate_tfidf(z)
-    y_pred2 = model.predict(a)[0]
-    if (y_pred2==0):
+    model = pickle.load(training_model)   
+"""
+f = input("enter review: ")
+z = Preparedata([f])
+a= getCountVectorizer_(z)
+s=getTFIDF(a)
+y_pred2 = model.predict(a)[0]
+
+if (y_pred2==0):
         print("Negative review !! ")
-    else:
+else:
         print ("Positive review ")
+
+"""
 
 #####################################################################################
 """
@@ -148,4 +153,6 @@ plt.show()
 """
 #####################################################################################
 
+"""
 
+"""
