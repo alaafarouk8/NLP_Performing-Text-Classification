@@ -114,23 +114,6 @@ classifier.fit(x_train, y_train)
 yPredications = classifier.predict(x_test)
 print("Accuracy: %" , accuracy_score(y_test, yPredications)*100)
 
-with open('assignment2', 'wb') as picklefile:
-    pickle.dump(classifier,picklefile)
-with open('assignment2', 'rb') as training_model:
-    model = pickle.load(training_model)   
-"""
-f = input("enter review: ")
-z = Preparedata([f])
-a= getCountVectorizer_(z)
-s=getTFIDF(a)
-y_pred2 = model.predict(a)[0]
-
-if (y_pred2==0):
-        print("Negative review !! ")
-else:
-        print ("Positive review ")
-
-"""
 
 #####################################################################################
 """
@@ -152,7 +135,3 @@ plt.ylabel('Y - value')
 plt.show()
 """
 #####################################################################################
-
-"""
-
-"""
